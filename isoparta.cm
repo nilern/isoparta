@@ -1,0 +1,18 @@
+Library
+    structure Result
+
+    signature SYNTAX_DOMAIN
+    signature SYNTAX
+    functor SyntaxFn
+    functor TextSyntaxFn
+
+    signature INPUT_STREAM 
+    functor ParserSyntaxFn
+is
+    $/basis.cm
+
+    src/Util.sml
+    src/PartialIso.sml
+    src/Syntax.sml
+    src/Parsers.sml
+

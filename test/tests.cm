@@ -1,0 +1,10 @@
+Library
+    structure Tests
+is
+    $/basis.cm
+
+    ../isoparta.cm
+
+    Arith.sml
+    Tests.sml
+
