@@ -1,3 +1,4 @@
+(* TODO: Switch to Prism since the Iso parse error is considered harmful? *)
 structure PartialIso :> sig
     type ('a, 'b) t
 

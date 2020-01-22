@@ -10,7 +10,7 @@ functor ParserSyntaxFn(Input : INPUT_STREAM) :> sig
 
     datatype error
         = EOF
-        | Iso
+        | Iso (* FIXME: Can't do static lookahead calculations if this is needed *)
     
     val build : 'a t -> (Input.instream -> (error, 'a * Input.instream) Result.t)
 end = struct
