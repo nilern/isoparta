@@ -7,7 +7,7 @@ signature SYNTAX_DOMAIN = sig
     val map : ('a, 'b) PartialIso.t -> 'a t -> 'b t
     val product : 'a t -> 'b t -> ('a * 'b) t
     val alt : 'a t -> 'a t -> 'a t
-    (* TODO: val fix : ('a t -> 'a t) -> 'a t *)
+    val fix : ('a t -> 'a t) -> 'a t
 end
 
 signature SYNTAX = sig
@@ -27,9 +27,21 @@ functor TextSyntaxFn(Syntax : SYNTAX where type tok = char) :> sig
         where type tok = Syntax.tok
 
     val digit : char t
+
+    val many : 'a t -> 'a list t
 end = struct
     open Syntax
 
     val digit = map (PartialIso.filter Char.isDigit) token
+
+    val iCons : (('a * 'a list), 'a list) PartialIso.t =
+        { apply = fn (x, xs) => SOME (x :: xs)
+        , unapply = fn x :: xs => SOME (x, xs)
+                     | [] => NONE }
+
+    fun many p =
+        fix (fn manyPs =>
+                 alt (map iCons (product p manyPs))
+                     (pure []))
 end
 

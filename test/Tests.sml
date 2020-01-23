@@ -4,8 +4,8 @@ structure Tests = struct
 
     fun testParser () =
         let val parse = TextParsers.build ArithParser.atom
-        in case parse (TextIO.getInstream (TextIO.openString "0"))
-           of Result.Right (#"0", _) => ()
+        in case parse (TextIO.getInstream (TextIO.openString "42"))
+           of Result.Right ([#"4", #"2"], _) => ()
             | Result.Right _ => raise Fail "Erroneous parse"
             | Result.Left err => raise Fail "Parser failed"
         end

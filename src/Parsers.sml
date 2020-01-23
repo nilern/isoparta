@@ -31,7 +31,11 @@ end = struct
     type 'a t = 'a impl option ref
 
     fun build (ref (SOME f)) = f
-      | build (ref NONE) = raise Fail "unreachable code reached"
+      | build (r as ref NONE) = (* OPTIMIZE *)
+         (fn input =>
+              (case !r
+               of SOME f => f input
+                | NONE => raise Fail "unreachable code reached"))
 
     val token =
         ref (SOME (fn input =>
@@ -67,6 +71,12 @@ end = struct
         let val parse = build p
             val parse' = build q
         in  ref (SOME (fn input => parse input |> Result.orElse (fn () => parse' input)))
+        end
+
+    fun fix holey =
+        let val parser = ref NONE
+        in parser := !(holey parser)
+         ; parser
         end
 end
 
