@@ -1,12 +1,18 @@
 structure Tests = struct
-    structure TextParsers = ParserSyntaxFn(TextIO.StreamIO)
+    structure TextParsers = ParserSyntaxFn(struct
+        open TextIO.StreamIO
+
+        val eqElems = op=
+    end)
     structure ArithParser = ArithFn(TextParsers)
 
     fun testParser () =
         let val parse = TextParsers.build ArithParser.atom
         in case parse (TextIO.getInstream (TextIO.openString "42"))
            of Result.Right ([#"4", #"2"], _) => ()
-            | Result.Right _ => raise Fail "Erroneous parse"
+            | Result.Right (res, _) =>
+               raise Fail ("Erroneous parse '" ^ List.foldl (fn (c, acc) => acc ^ String.str c)
+                                                            "" res ^ "'")
             | Result.Left err => raise Fail "Parser failed"
         end
 

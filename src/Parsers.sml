@@ -2,6 +2,7 @@ signature INPUT_STREAM = sig
     type instream
     type elem
 
+    val eqElems : elem * elem -> bool
     val input1 : instream -> (elem * instream) option
 end
 
@@ -10,7 +11,7 @@ functor ParserSyntaxFn(Input : INPUT_STREAM) :> sig
 
     datatype error
         = EOF
-        | Iso (* FIXME: Can't do static lookahead calculations if this is needed *)
+        | Unexpected of tok * tok
     
     val build : 'a t -> (Input.instream -> (error, 'a * Input.instream) Result.t)
 end = struct
@@ -24,7 +25,7 @@ end = struct
 
     datatype error
         = EOF
-        | Iso
+        | Unexpected of tok * tok
 
     type 'a impl = instream -> (error, 'a * instream) Result.t
 
@@ -37,10 +38,13 @@ end = struct
                of SOME f => f input
                 | NONE => raise Fail "unreachable code reached"))
 
-    val token =
+    fun token expected =
         ref (SOME (fn input =>
                        case Input.input1 input
-                       of SOME (tok, input) => Right (tok, input)
+                       of SOME (tok, input) =>
+                           if Input.eqElems (tok, expected)
+                           then Right (tok, input)
+                           else Left (Unexpected (expected, tok))
                         | NONE => Left EOF))
 
     fun pure v =
@@ -48,13 +52,10 @@ end = struct
 
     fun map iso p =
         let val parse = build p
-            val f = PartialIso.apply iso
+            val f = Prism.apply iso
         in  ref (SOME (fn input =>
                            parse input
-                           |> Result.flatMap (fn (v, input) =>
-                                                  (case f v
-                                                   of SOME v => Right (v, input)
-                                                    | NONE => Left Iso))))
+                           |> Result.map (fn (v, input) => (f v, input))))
         end
 
     fun product p q =

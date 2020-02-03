@@ -12,7 +12,7 @@ is
     $/basis.cm
 
     src/Util.sml
-    src/PartialIso.sml
+    src/Prism.sml
     src/Syntax.sml
     src/Parsers.sml
 

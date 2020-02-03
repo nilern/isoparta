@@ -2,9 +2,9 @@ signature SYNTAX_DOMAIN = sig
     type 'a t
     type tok
 
-    val token : tok t
+    val token : tok -> tok t
     val pure : 'a -> 'a t
-    val map : ('a, 'b) PartialIso.t -> 'a t -> 'b t
+    val map : ('a, 'b) Prism.t -> 'a t -> 'b t
     val product : 'a t -> 'b t -> ('a * 'b) t
     val alt : 'a t -> 'a t -> 'a t
     val fix : ('a t -> 'a t) -> 'a t
@@ -26,16 +26,12 @@ functor TextSyntaxFn(Syntax : SYNTAX where type tok = char) :> sig
         where type 'a t = 'a Syntax.t
         where type tok = Syntax.tok
 
-    val digit : char t
-
     val many : 'a t -> 'a list t
 end = struct
     open Syntax
 
-    val digit = map (PartialIso.filter Char.isDigit) token
-
-    val iCons : (('a * 'a list), 'a list) PartialIso.t =
-        { apply = fn (x, xs) => SOME (x :: xs)
+    val iCons : (('a * 'a list), 'a list) Prism.t =
+        { apply = op::
         , unapply = fn x :: xs => SOME (x, xs)
                      | [] => NONE }
 
