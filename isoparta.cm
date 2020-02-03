@@ -10,6 +10,7 @@ Library
     functor ParserSyntaxFn
 is
     $/basis.cm
+    $/smlnj-lib.cm
 
     src/Util.sml
     src/Prism.sml

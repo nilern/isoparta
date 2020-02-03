@@ -2,6 +2,7 @@ Library
     structure Tests
 is
     $/basis.cm
+    $/smlnj-lib.cm
 
     ../isoparta.cm
 

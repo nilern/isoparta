@@ -2,6 +2,12 @@ structure Tests = struct
     structure TextParsers = ParserSyntaxFn(struct
         open TextIO.StreamIO
 
+        structure ElemSet = BinarySetFn(struct
+            open Char
+
+            type ord_key = char
+        end)
+
         val eqElems = op=
     end)
     structure ArithParser = ArithFn(TextParsers)
